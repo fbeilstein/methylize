@@ -171,7 +171,7 @@ Returns:
                 covariate_data = pheno_data.drop(kwargs.get('column'), axis=1) #all but one
             elif isinstance(kwargs.get('covariates'), (list,tuple)):
                 try:
-                    covariate_data = pheno_data[[ covariates ]]
+                    covariate_data = pheno_data[[ kwargs.get("covariates") ]]
                 except KeyError:
                     raise KeyError(f"Your covariates list of labels must match your pheno_data columns exactly.")
             elif kwargs.get('covariates') == None:
