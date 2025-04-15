@@ -278,8 +278,9 @@ Returns:
     # check if meth_data is beta or M-values, then convert to M-values if necessary
     m_values = True if ((meth_data < 0).any().sum() > 0 or (meth_data > 1).any().sum() > 0) else False
     if not m_values:
-        def beta2m(val):
-            return math.log2(val/(1-val))
+        def beta2m(val, epsilon=1e-10):
+            val = min(max(val, epsilon), 1 - epsilon)
+            return math.log2(val / (1 - val))
         meth_data = meth_data.apply(np.vectorize(beta2m))
         if verbose: LOGGER.info(f"Converted your beta values into M-values; {meth_data.shape}")
 
