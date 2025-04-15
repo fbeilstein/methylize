@@ -13,6 +13,7 @@ import matplotlib # color maps
 import datetime
 import methylprep
 from tqdm.autonotebook import tqdm
+import gc
 
 # app
 from .helpers import color_schemes, create_probe_chr_map, create_mapinfo
@@ -343,7 +344,7 @@ Returns:
                             probe_data.name = _probe
                             multi_probe_errors += 1
                         # columns are probes, so each probe passes in parallel
-                        yield probe_data
+                        yield probe_data.copy()
                 # Apply the linear regression function to each column in meth_data (all use the same phenotype data array)
                 probe_stat_rows = parallel(func(probe_data, pheno_data_array, alpha=alpha) for probe_data in tqdm(para_gen(meth_data), total=len(all_probes), desc='Probes') )
                 # Concatenate the probes' statistics together into one dataframe
@@ -352,6 +353,8 @@ Returns:
         # Combine the parallel-processed linear regression results into one pandas dataframe
         # The concatenation after joblib's parallellization produced a dataframe with a column for each probe
         # so transpose it to probes by rows instead
+        del meth_data
+        gc.collect()
         probe_stats = linear_probe_stats.T
 
         """ Note:
@@ -436,7 +439,7 @@ Returns:
                             probe_data.name = _probe
                             multi_probe_errors += 1
                         # columns are probes, so each probe passes in parallel
-                        yield probe_data
+                        yield probe_data.copy()
                 # this generates all the data without loading into memory, and fixes mouse array
                 probe_stat_rows = parallel(func(probe_data, pheno_data_binary, covariate_data=covariate_data) for probe_data in tqdm(para_gen(meth_data), total=len(all_probes), desc='Probes') )
                 # Concatenate the probes' statistics together into one dataframe
@@ -445,6 +448,8 @@ Returns:
         # Combine the parallel-processed linear regression results into one pandas dataframe
         # The concatenation after joblib's parallellization produced a dataframe with a column for each probe
         # so transpose it to probes by rows instead
+        del meth_data
+        gc.collect()
         probe_stats = logistic_probe_stats.T
 
         # Pull out probes that encountered perfect separation or linear algebra errors to remove them from the
