@@ -1417,7 +1417,8 @@ visualization kwargs
     if bonferroni:
         bonferroni_cutoff = sm.stats.multipletests(df["PValue"], alpha=fwer, method='bonferroni')[3]
         bonferroni_cutoff_label = "{:.2e}".format(bonferroni_cutoff)
-        add_cutoff_line(df, ax, arbitrary_value=bonferroni_cutoff, color='gray', label=f"Bonferroni: {bonferroni_cutoff_label}")
+        b_color = bonferroni['color'] if isinstance(bonferroni, dict) and 'color' in bonferroni else 'gray'
+        add_cutoff_line(df, ax, arbitrary_value=bonferroni_cutoff, color=b_color, label=f"Bonferroni: {bonferroni_cutoff_label}")
     # find the p-value where FDR-Q ~ 0.05
     no_fdr_probes = None
     try:
@@ -1430,7 +1431,8 @@ visualization kwargs
             raise Exception("No significant probes")
         fdr_label = "{:.2e}".format(fdr_cutoff)
         if fdr:
-            add_cutoff_line(df, ax, arbitrary_value=fdr_cutoff, color='black', label=f"FDR: {fdr_label}")
+            fdr_color = bonferroni['color'] if isinstance(fdr, dict) and 'color' in fdr else 'black'
+            add_cutoff_line(df, ax, arbitrary_value=fdr_cutoff, color=fdr_color, label=f"FDR: {fdr_label}")
         no_fdr_probes = False
     except Exception as e:
         print(f"Error: {e} (FDR line omitted from plot)")
