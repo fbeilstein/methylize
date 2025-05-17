@@ -174,6 +174,11 @@ Returns:
                 covariate_data = pheno_data.drop(kwargs.get('column'), axis=1) #all but one
             elif isinstance(kwargs.get('covariates'), (list,tuple)):
                 try:
+                    covariate_data = pheno_data[ kwargs.get("covariates") ]
+                except KeyError:
+                    raise KeyError(f"Your covariates list of labels must match your pheno_data columns exactly.")
+            elif isinstance(kwargs.get('covariates'), str):
+                try:
                     covariate_data = pheno_data[[ kwargs.get("covariates") ]]
                 except KeyError:
                     raise KeyError(f"Your covariates list of labels must match your pheno_data columns exactly.")
@@ -181,7 +186,7 @@ Returns:
                 pass # ignore extra columns in pheno_data (default)
             pheno_data = pheno_data[kwargs.get('column')]
         except Exception as e:
-            raise ValueError("Column name you specified for pheno_data did not work: {kwargs.get('column')} ERROR: {e}")
+            raise ValueError(f"Column name you specified for pheno_data did not work: {kwargs.get('column')} ERROR: {e}")
     elif isinstance(pheno_data, pd.DataFrame) and pheno_data.shape[1] == 1:
         pheno_data = pheno_data[ pheno_data.columns[0] ] # convert a single-Column DataFrame to Series
     elif isinstance(pheno_data, pd.DataFrame):
